@@ -25,7 +25,7 @@
   --color-success: #5C7A52;
 
   --font-display: var(--font-fraunces);
-  --font-body: var(--font-manrope);
+  --font-sans: var(--font-poppins);
   --font-mono: var(--font-plex-mono);
 }
 
@@ -48,7 +48,7 @@
   --color-success: var(--color-success);
 
   --font-display: var(--font-display);
-  --font-body: var(--font-body);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 }
 
@@ -63,7 +63,7 @@ html {
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
 }
 
 ::selection {
