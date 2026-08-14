@@ -5,6 +5,7 @@ import Providers from "@/components/providers";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { AppToaster } from "@/components/toaster";
+import { Metadata } from "next";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -28,7 +29,7 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Ferrous & Field — Home Decor Atelier",
   description:
     "Considered furniture, lighting, and objects for a home that feels made, not furnished.",
@@ -45,7 +46,7 @@ export const metadata = {
         alt: "Ferrous & Field — Home Decor Atelier",
       },
     ],
-    locale: "bn_BD",
+    locale: "en_US",
     type: "website",
   },
 };
