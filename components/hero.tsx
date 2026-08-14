@@ -46,23 +46,17 @@ export default function Hero() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease, delay: 0.3 }}
-            className="mt-9 flex items-center gap-6"
+            className="mt-8 sm:mt-9 flex flex-wrap items-center gap-x-6 gap-y-4"
           >
             <Link
               href="/products"
-              className="group inline-flex items-center gap-2 rounded-full bg-ink text-cream px-7 py-3.5 text-sm font-medium hover:bg-clay-dark transition-colors"
+              className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-ink text-cream px-7 py-3.5 text-sm font-medium hover:bg-clay-dark transition-colors"
             >
               Shop the collection
               <ArrowUpRight
                 size={15}
                 className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               />
-            </Link>
-            <Link
-              href="/products?category=Lighting"
-              className="text-sm text-ink-soft border-b border-transparent hover:border-ink hover:text-ink transition-colors pb-0.5"
-            >
-              Explore lighting
             </Link>
           </motion.div>
         </div>
