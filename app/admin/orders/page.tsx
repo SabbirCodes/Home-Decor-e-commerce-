@@ -1,18 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import axios from "axios";
 import { motion } from "motion/react";
+import { Eye } from "lucide-react";
 import { notify } from "@/components/toaster";
 import type { IOrder } from "@/types";
 
-const STATUSES = [
-  "pending",
-  "processing",
-  "shipped",
-  "delivered",
-  "cancelled",
-] as const;
+const STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-brass/15 text-brass",
@@ -35,11 +31,7 @@ export default function AdminOrdersPage() {
 
   const updateStatus = async (id: string, status: string) => {
     const prev = orders;
-    setOrders((o) =>
-      o.map((ord) =>
-        ord._id === id ? { ...ord, status: status as any } : ord,
-      ),
-    );
+    setOrders((o) => o.map((ord) => (ord._id === id ? { ...ord, status: status as any } : ord)));
     try {
       await axios.put(`/api/orders/${id}`, { status });
       notify.success("Order status updated.");
@@ -56,19 +48,14 @@ export default function AdminOrdersPage() {
       {loading ? (
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-20 rounded-lg bg-surface-2 animate-pulse"
-            />
+            <div key={i} className="h-20 rounded-lg bg-surface-2 animate-pulse" />
           ))}
         </div>
       ) : (
         <div className="space-y-3">
           {orders.map((order, i) => {
             const customer =
-              order.user && typeof order.user === "object"
-                ? order.user.name || "Customer"
-                : "Customer";
+              order.user && typeof order.user === "object" ? order.user.name : "Customer";
             return (
               <motion.div
                 key={order._id}
@@ -83,12 +70,11 @@ export default function AdminOrdersPage() {
                     <p className="text-xs text-ink-soft">
                       #{order._id.slice(-8).toUpperCase()} ·{" "}
                       {new Date(order.createdAt).toLocaleDateString()} ·{" "}
-                      {order.items.length} item
-                      {order.items.length > 1 ? "s" : ""}
+                      {order.items.length} item{order.items.length > 1 ? "s" : ""}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <span className="font-mono text-sm text-ink">
                       ${order.totalPrice.toFixed(2)}
                     </span>
@@ -98,20 +84,23 @@ export default function AdminOrdersPage() {
                       className={`text-xs font-medium capitalize rounded-full px-3 py-1.5 outline-none cursor-pointer border-0 ${STATUS_STYLES[order.status]}`}
                     >
                       {STATUSES.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
+                        <option key={s} value={s}>{s}</option>
                       ))}
                     </select>
+                    <Link
+                      href={`/admin/orders/${order._id}`}
+                      className="p-2 text-ink-soft hover:text-clay transition-colors"
+                      aria-label="View order details"
+                    >
+                      <Eye size={16} strokeWidth={1.75} />
+                    </Link>
                   </div>
                 </div>
               </motion.div>
             );
           })}
 
-          {!orders.length && (
-            <p className="text-sm text-ink-soft">No orders placed yet.</p>
-          )}
+          {!orders.length && <p className="text-sm text-ink-soft">No orders placed yet.</p>}
         </div>
       )}
     </div>

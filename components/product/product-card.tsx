@@ -43,7 +43,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
       return;
     }
     try {
-      const added = await toggleWishlist(product._id);
+      const added = await toggleWishlist(product);
       notify.wishlist(added ? "Saved to wishlist" : "Removed from wishlist");
     } catch {
       notify.error("Something went wrong.");
@@ -108,15 +108,23 @@ export default function ProductCard({ product }: { product: IProduct }) {
           <p className="text-[10px] tracking-[0.16em] uppercase text-ink-soft/70">
             {product.category}
           </p>
-          <h3 className="mt-1 truncate text-[15px] text-ink font-medium">{product.name}</h3>
+          <h3 className="mt-1 truncate text-[15px] text-ink font-medium">
+            {product.name}
+          </h3>
           {product.ratingCount > 0 && (
             <div className="mt-1">
-              <RatingDisplay value={product.ratingAverage} count={product.ratingCount} size={11} />
+              <RatingDisplay
+                value={product.ratingAverage}
+                count={product.ratingCount}
+                size={11}
+              />
             </div>
           )}
         </div>
         <div className="text-right shrink-0">
-          <p className="font-mono text-[13px] text-ink">${product.price.toFixed(2)}</p>
+          <p className="font-mono text-[13px] text-ink">
+            ${product.price.toFixed(2)}
+          </p>
           {product.compareAtPrice && (
             <p className="font-mono text-[11px] text-ink-soft/60 line-through">
               ${product.compareAtPrice.toFixed(2)}

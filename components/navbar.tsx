@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { Heart, ShoppingBag, User, Menu, X } from "lucide-react";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useCartStore } from "@/lib/useCartStore";
 
 const NAV_LINKS = [
@@ -16,11 +16,10 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
   const totalItems = useCartStore((s) => s.totalItems());
 
   useEffect(() => {
@@ -34,6 +33,8 @@ export default function Navbar() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenuOpen(false);
   }, [pathname]);
+
+  const accountHref = session ? (session.user.role === "admin" ? "/admin" : "/profile") : "/login";
 
   return (
     <header
@@ -105,58 +106,22 @@ export default function Navbar() {
               </AnimatePresence>
             </Link>
 
-            <div className="relative">
-              <button
+            {status === "authenticated" ? (
+              <Link
+                href={accountHref}
                 className="p-2 text-ink-soft hover:text-ink transition-colors"
-                onClick={() => setAccountOpen((v) => !v)}
-                onBlur={() => setTimeout(() => setAccountOpen(false), 150)}
-                aria-label="Account"
+                aria-label={session!.user.role === "admin" ? "Admin dashboard" : "Your profile"}
               >
                 <User size={18} strokeWidth={1.75} />
-              </button>
-              <AnimatePresence>
-                {accountOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -6, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -6, scale: 0.97 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-48 rounded-xl border border-line bg-surface shadow-xl shadow-black/5 overflow-hidden py-1.5"
-                  >
-                    {session ? (
-                      <>
-                        <div className="px-4 py-2 text-xs text-ink-soft border-b border-line mb-1">
-                          {session.user.name}
-                        </div>
-                        <Link href="/account/orders" className="block px-4 py-2 text-sm hover:bg-surface-2">
-                          Order history
-                        </Link>
-                        {session.user.role === "admin" && (
-                          <Link href="/admin" className="block px-4 py-2 text-sm hover:bg-surface-2">
-                            Admin dashboard
-                          </Link>
-                        )}
-                        <button
-                          onClick={() => signOut()}
-                          className="w-full text-left px-4 py-2 text-sm text-danger hover:bg-surface-2"
-                        >
-                          Sign out
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <Link href="/login" className="block px-4 py-2 text-sm hover:bg-surface-2">
-                          Sign in
-                        </Link>
-                        <Link href="/register" className="block px-4 py-2 text-sm hover:bg-surface-2">
-                          Create account
-                        </Link>
-                      </>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="ml-1 rounded-full bg-ink text-cream px-4 py-2 text-xs font-medium hover:bg-clay-dark transition-colors"
+              >
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </div>

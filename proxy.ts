@@ -1,37 +1,30 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 
-export default auth((req) => {
+const PROTECTED_PREFIXES = ["/account", "/checkout", "/wishlist", "/profile"];
+const ADMIN_PREFIX = "/admin";
+
+export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const session = req.auth;
+  const session = await auth();
 
-  // Only protect admin routes
-  if (!pathname.startsWith("/admin")) {
-    return NextResponse.next();
-  }
+  const isAdminRoute = pathname.startsWith(ADMIN_PREFIX);
+  const isProtectedRoute = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
 
-  // Not logged in
-  if (!session) {
+  if ((isAdminRoute || isProtectedRoute) && !session) {
     const loginUrl = new URL("/login", req.url);
-
-    loginUrl.searchParams.set(
-      "callbackUrl",
-      pathname
-    );
-
+    loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Logged in but not an admin
-  if (session.user?.role !== "admin") {
-    return NextResponse.redirect(
-      new URL("/", req.url)
-    );
+  if (isAdminRoute && session && session.user.role !== "admin") {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/account/:path*", "/checkout/:path*", "/wishlist/:path*", "/profile/:path*", "/admin/:path*"],
 };

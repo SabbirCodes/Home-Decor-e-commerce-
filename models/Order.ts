@@ -25,6 +25,8 @@ export interface OrderDocument extends Document {
   shippingPrice: number;
   totalPrice: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  trackingNumber?: string;
+  carrier?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -62,6 +64,8 @@ const OrderSchema = new Schema<OrderDocument>(
       enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
       default: "pending",
     },
+    trackingNumber: { type: String, default: "" },
+    carrier: { type: String, default: "" },
   },
   { timestamps: true }
 );

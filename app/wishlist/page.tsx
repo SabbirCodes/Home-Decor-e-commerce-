@@ -1,34 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { Heart } from "lucide-react";
 import ProductGrid from "@/components/product/product-grid";
 import Button from "@/components/button";
-import type { IProduct } from "@/types";
+import { useWishlistStore } from "@/lib/useWishlistStore";
 
 export default function WishlistPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const items = useWishlistStore((s) => s.items);
+  const loaded = useWishlistStore((s) => s.loaded);
+  const load = useWishlistStore((s) => s.load);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login?callbackUrl=/wishlist");
       return;
     }
-    if (status === "authenticated") {
-      axios
-        .get("/api/wishlist")
-        .then(({ data }) => setProducts(data.products))
-        .finally(() => setLoading(false));
+    if (status === "authenticated" && !loaded) {
+      load();
     }
-  }, [status, router]);
+  }, [status, loaded, load, router]);
 
-  if (status === "loading" || loading) {
+  if (status === "loading" || (!loaded && status === "authenticated")) {
     return (
       <div className="mx-auto max-w-7xl px-5 sm:px-8 py-14">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -40,7 +38,7 @@ export default function WishlistPage() {
     );
   }
 
-  if (!products.length) {
+  if (!items.length) {
     return (
       <div className="mx-auto max-w-2xl px-5 py-28 text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-surface-2 mb-6">
@@ -56,7 +54,7 @@ export default function WishlistPage() {
   return (
     <div className="mx-auto max-w-7xl px-5 sm:px-8 py-10 md:py-14">
       <h1 className="font-display text-4xl text-ink mb-10">Your wishlist</h1>
-      <ProductGrid products={products} />
+      <ProductGrid products={items} />
     </div>
   );
 }

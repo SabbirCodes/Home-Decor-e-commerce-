@@ -107,6 +107,15 @@ export default function OrderHistoryPage() {
               <span className="text-ink">Total</span>
               <span className="font-mono text-ink">${order.totalPrice.toFixed(2)}</span>
             </div>
+
+            {order.trackingNumber && (
+              <div className="mt-3 pt-3 border-t border-line flex flex-wrap items-center justify-between gap-2 text-sm">
+                <span className="text-ink-soft">
+                  {order.carrier ? `${order.carrier} · ` : ""}Tracking
+                </span>
+                <span className="font-mono text-ink">{order.trackingNumber}</span>
+              </div>
+            )}
           </motion.div>
         ))}
       </div>

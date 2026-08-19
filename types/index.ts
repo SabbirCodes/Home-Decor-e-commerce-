@@ -40,7 +40,7 @@ export interface IShippingAddress {
 
 export interface IOrder {
   _id: string;
-  user: string | { _id: string; name: string; email: string };
+  user: string | { _id: string; name: string; email: string } | null;
   items: IOrderItem[];
   shippingAddress: IShippingAddress;
   paymentMethod: "cod";
@@ -48,6 +48,8 @@ export interface IOrder {
   shippingPrice: number;
   totalPrice: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  trackingNumber?: string;
+  carrier?: string;
   createdAt: string;
   updatedAt?: string;
 }
@@ -69,6 +71,7 @@ export interface IUser {
   image?: string;
   role: "customer" | "admin";
   address?: Partial<IShippingAddress>;
+  createdAt?: string;
 }
 
 export interface CartItem {

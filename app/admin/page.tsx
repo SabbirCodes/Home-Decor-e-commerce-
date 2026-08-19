@@ -1,45 +1,44 @@
-import Product from "@/models/Product";
-import Order from "@/models/Order";
-import User from "@/models/User";
 import { Package, ShoppingCart, Users, DollarSign } from "lucide-react";
 import Link from "next/link";
-import { connectDB } from "@/lib/db";
+import { serverFetch } from "@/lib/serverFetch";
+import type { IOrder } from "@/types";
 
 export const dynamic = "force-dynamic";
 
+interface StatsResponse {
+  productCount: number;
+  orderCount: number;
+  userCount: number;
+  revenue: number;
+  recentOrders: (IOrder & { user: { name: string } | null })[];
+}
+
 export default async function AdminDashboard() {
-  await connectDB();
-
-  const [productCount, orderCount, userCount, orders] = await Promise.all([
-    Product.countDocuments(),
-    Order.countDocuments(),
-    User.countDocuments(),
-    Order.find().sort({ createdAt: -1 }).limit(5).populate("user", "name"),
-  ]);
-
-  const revenue = await Order.aggregate([
-    { $match: { status: { $ne: "cancelled" } } },
-    { $group: { _id: null, total: { $sum: "$totalPrice" } } },
-  ]);
+  const data = await serverFetch<StatsResponse>("/api/admin/stats");
 
   const stats = [
-    { label: "Total revenue", value: `$${(revenue[0]?.total || 0).toFixed(2)}`, icon: DollarSign },
-    { label: "Orders", value: orderCount, icon: ShoppingCart },
-    { label: "Products", value: productCount, icon: Package },
-    { label: "Customers", value: userCount, icon: Users },
+    { label: "Total revenue", value: `$${(data?.revenue || 0).toFixed(2)}`, icon: DollarSign, href: "/admin/orders" },
+    { label: "Orders", value: data?.orderCount || 0, icon: ShoppingCart, href: "/admin/orders" },
+    { label: "Products", value: data?.productCount || 0, icon: Package, href: "/admin/products" },
+    { label: "Customers", value: data?.userCount || 0, icon: Users, href: "/admin/customers" },
   ];
+  const orders = data?.recentOrders || [];
 
   return (
     <div>
       <h1 className="font-display text-3xl text-ink mb-8">Dashboard</h1>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        {stats.map(({ label, value, icon: Icon }) => (
-          <div key={label} className="rounded-xl border border-line bg-surface p-5">
+        {stats.map(({ label, value, icon: Icon, href }) => (
+          <Link
+            key={label}
+            href={href}
+            className="rounded-xl border border-line bg-surface p-5 hover:bg-surface-2 transition-colors"
+          >
             <Icon size={18} strokeWidth={1.5} className="text-clay mb-3" />
             <p className="font-mono text-2xl text-ink">{value}</p>
             <p className="text-xs text-ink-soft mt-1">{label}</p>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -55,15 +54,19 @@ export default async function AdminDashboard() {
           <p className="text-sm text-ink-soft">No orders yet.</p>
         ) : (
           <div className="divide-y divide-line">
-            {orders.map((order: any) => (
-              <div key={order._id} className="flex items-center justify-between py-3 text-sm">
+            {orders.map((order: IOrder & { user: { name: string } | null }) => (
+              <Link
+                key={order._id}
+                href={`/admin/orders/${order._id}`}
+                className="flex items-center justify-between py-3 text-sm hover:bg-surface-2 -mx-2 px-2 rounded-md transition-colors"
+              >
                 <div>
                   <p className="text-ink font-medium">{order.user?.name || "Guest"}</p>
                   <p className="text-xs text-ink-soft">#{order._id.toString().slice(-8).toUpperCase()}</p>
                 </div>
                 <span className="font-mono text-ink">${order.totalPrice.toFixed(2)}</span>
                 <span className="text-xs capitalize text-ink-soft">{order.status}</span>
-              </div>
+              </Link>
             ))}
           </div>
         )}
