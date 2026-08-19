@@ -1,36 +1,47 @@
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { serverFetch } from "@/lib/serverFetch";
 import ContactForm from "@/components/contact-form";
+import type { ISiteSettings } from "@/types";
 
-export const metadata = { title: "Contact Us — Ferrous & Field" };
+export const dynamic = "force-dynamic";
 
-const CONTACT_DETAILS = [
-  {
-    icon: Mail,
-    label: "Email",
-    value: "hello@ferrousfield.com",
-    href: "mailto:hello@ferrousfield.com",
-  },
-  {
-    icon: Phone,
-    label: "Phone",
-    value: "+880 1700-123456",
-    href: "tel:+8801700123456",
-  },
-  {
-    icon: MapPin,
-    label: "Studio",
-    value: "Dhanmondi, Dhaka, Bangladesh",
-    href: "https://maps.google.com/?q=Dhanmondi+Dhaka+Bangladesh",
-  },
-  {
-    icon: Clock,
-    label: "Hours",
-    value: "Sat–Thu, 10am–7pm BST",
-    href: null,
-  },
-];
+export async function generateMetadata() {
+  const data = await serverFetch<{ settings: ISiteSettings }>("/api/settings");
+  const siteName = data?.settings?.siteName || "Ferrous & Field";
+  return { title: `Contact Us — ${siteName}` };
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const data = await serverFetch<{ settings: ISiteSettings }>("/api/settings");
+  const settings = data?.settings;
+
+  const CONTACT_DETAILS = [
+    {
+      icon: Mail,
+      label: "Email",
+      value: settings?.email || "hello@ferrousfield.com",
+      href: settings?.email ? `mailto:${settings.email}` : null,
+    },
+    {
+      icon: Phone,
+      label: "Phone",
+      value: settings?.phone || "",
+      href: settings?.phone ? `tel:${settings.phone.replace(/[^+\d]/g, "")}` : null,
+    },
+    {
+      icon: MapPin,
+      label: "Studio",
+      value: settings?.location || "",
+      href: settings?.locationMapUrl || null,
+    },
+    {
+      icon: Clock,
+      label: "Hours",
+      value: settings?.hours || "",
+      href: null,
+    },
+  ].filter((d) => d.value);
+
   return (
     <div className="mx-auto max-w-5xl px-5 sm:px-8 py-14 md:py-20">
       <div className="text-center max-w-xl mx-auto mb-14">

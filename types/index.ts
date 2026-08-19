@@ -83,3 +83,23 @@ export interface CartItem {
   quantity: number;
   stock?: number;
 }
+
+export interface ISiteSettings {
+  siteName: string;
+  email: string;
+  phone: string;
+  location: string;
+  locationMapUrl: string;
+  hours: string;
+  updatedAt?: string;
+}
+
+export interface IContactMessage {
+  _id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+}

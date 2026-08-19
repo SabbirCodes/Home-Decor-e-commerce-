@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import axios from "axios";
 import { motion, AnimatePresence } from "motion/react";
 import { Send, CheckCircle2 } from "lucide-react";
 import Button from "@/components/button";
+import { notify } from "@/components/toaster";
 
 const SUBJECTS = ["General question", "Order support", "Wholesale / trade", "Press", "Something else"];
 
@@ -21,9 +23,14 @@ export default function ContactForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    await new Promise((r) => setTimeout(r, 700));
-    setSending(false);
-    setSent(true);
+    try {
+      await axios.post("/api/contact", form);
+      setSent(true);
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || "Failed to send your message.");
+    } finally {
+      setSending(false);
+    }
   };
 
   if (sent) {

@@ -15,7 +15,7 @@ const NAV_LINKS = [
   { href: "/products?category=Decor", label: "Decor" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ siteName = "Ferrous & Field" }: { siteName?: string }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -54,7 +54,7 @@ export default function Navbar() {
 
           <Link href="/" className="flex flex-col items-start leading-none">
             <span className="font-display italic text-[1.35rem] tracking-tight text-ink">
-              Ferrous &amp; Field
+              {siteName}
             </span>
             <span className="hidden sm:block text-[9px] tracking-[0.28em] uppercase text-ink-soft mt-0.5">
               Home Atelier

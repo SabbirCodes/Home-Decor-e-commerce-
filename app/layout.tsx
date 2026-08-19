@@ -5,7 +5,8 @@ import Providers from "@/components/providers";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { AppToaster } from "@/components/toaster";
-import { Metadata } from "next";
+import { serverFetch } from "@/lib/serverFetch";
+import type { ISiteSettings } from "@/types";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -29,36 +30,54 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Ferrous & Field — Home Decor Atelier",
-  description:
-    "Considered furniture, lighting, and objects for a home that feels made, not furnished.",
+const FALLBACK_SITE_NAME = "Ferrous & Field";
+const DESCRIPTION =
+  "Considered furniture, lighting, and objects for a home that feels made, not furnished.";
 
-  openGraph: {
-    title: "Ferrous & Field — Home Decor Atelier",
-    description: "Considered furniture, lighting, and objects for a home that feels made, not furnished.",
-    siteName: "Ferrous & Field",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Ferrous & Field — Home Decor Atelier",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-};
+async function getSiteName() {
+  try {
+    const data = await serverFetch<{ settings: ISiteSettings }>("/api/settings");
+    return data?.settings?.siteName || FALLBACK_SITE_NAME;
+  } catch {
+    return FALLBACK_SITE_NAME;
+  }
+}
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export async function generateMetadata() {
+  const siteName = await getSiteName();
+  const title = `${siteName} — Home Decor Atelier`;
+
+  return {
+    title,
+    description: DESCRIPTION,
+    openGraph: {
+      title,
+      description: DESCRIPTION,
+      siteName,
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      locale: "bn_BD",
+      type: "website",
+    },
+  };
+}
+
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const siteName = await getSiteName();
+
   return (
     <html lang="en" className={`${fraunces.variable} ${poppins.variable} ${plexMono.variable}`}>
       <body className="antialiased font-sans">
         <Providers>
-          <Navbar />
+          <Navbar siteName={siteName} />
           <main className="min-h-screen">{children}</main>
-          <Footer />
+          <Footer siteName={siteName} />
           <AppToaster />
         </Providers>
       </body>

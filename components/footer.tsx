@@ -2,13 +2,13 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import { FaInstagram, FaFacebookF } from "react-icons/fa";
 
-export default function Footer() {
+export default function Footer({ siteName = "Ferrous & Field" }: { siteName?: string }) {
   return (
     <footer className="bg-dusk text-cream/90 mt-24">
       <div className="mx-auto max-w-7xl px-5 sm:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
           <div className="col-span-2">
-            <span className="font-display italic text-2xl">Ferrous &amp; Field</span>
+            <span className="font-display italic text-2xl">{siteName}</span>
             <p className="mt-4 text-sm text-cream/50 max-w-xs leading-relaxed">
               Considered furniture, lighting, and objects — sourced from makers who work
               in small batches, built to outlast trend cycles.
@@ -42,7 +42,7 @@ export default function Footer() {
               <li><Link href="/account/orders" className="hover:text-clay transition-colors">Track an order</Link></li>
               <li><Link href="/shipping-returns" className="hover:text-clay transition-colors">Shipping &amp; returns</Link></li>
               <li><Link href="/care-guide" className="hover:text-clay transition-colors">Care guide</Link></li>
-              <li><Link href="/contact-us" className="hover:text-clay transition-colors">Contact us</Link></li>
+              <li><Link href="/contact" className="hover:text-clay transition-colors">Contact us</Link></li>
             </ul>
           </div>
 
@@ -57,7 +57,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-14 pt-6 border-t border-cream/10 flex flex-col sm:flex-row justify-between gap-3 text-xs text-cream/35">
-          <span>© {new Date().getFullYear()} Ferrous &amp; Field. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} {siteName}. All rights reserved.</span>
           <span className="font-mono">Made with care, shipped with patience.</span>
         </div>
       </div>
