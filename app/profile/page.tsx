@@ -7,6 +7,7 @@ import axios from "axios";
 import { motion } from "motion/react";
 import { Package, Heart, LogOut, ShieldCheck } from "lucide-react";
 import Button from "@/components/button";
+import ConfirmModal from "@/components/modal";
 import { notify } from "@/components/toaster";
 import type { IUser } from "@/types";
 
@@ -30,6 +31,8 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState("");
   const [address, setAddress] = useState<AddressForm>(EMPTY_ADDRESS);
+  const [signOutOpen, setSignOutOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -65,6 +68,11 @@ export default function ProfilePage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    await signOut({ callbackUrl: "/" });
   };
 
   if (status === "loading" || loading) {
@@ -155,11 +163,21 @@ export default function ProfilePage() {
       </motion.form>
 
       <button
-        onClick={() => signOut({ callbackUrl: "/" })}
+        onClick={() => setSignOutOpen(true)}
         className="mt-6 flex items-center gap-2 text-sm text-danger hover:underline"
       >
         <LogOut size={14} /> Sign out
       </button>
+
+      <ConfirmModal
+        open={signOutOpen}
+        title="Sign out?"
+        description="You'll need to sign in again to view your orders, wishlist, and account details."
+        confirmLabel="Sign out"
+        loading={signingOut}
+        onConfirm={handleSignOut}
+        onCancel={() => setSignOutOpen(false)}
+      />
     </div>
   );
 }

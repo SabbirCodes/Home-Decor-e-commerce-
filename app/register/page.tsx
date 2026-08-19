@@ -7,12 +7,14 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import axios from "axios";
 import { motion } from "motion/react";
+import { Eye, EyeOff } from "lucide-react";
 import Button from "@/components/button";
 import { notify } from "@/components/toaster";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,15 +78,26 @@ export default function RegisterPage() {
             </label>
             <label className="block">
               <span className="block text-xs text-ink-soft mb-1.5">Password</span>
-              <input
-                type="password"
-                name="password"
-                required
-                minLength={6}
-                value={form.password}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-line bg-surface px-4 py-2.5 text-sm outline-none focus:border-clay transition-colors"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  required
+                  minLength={6}
+                  value={form.password}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-line bg-surface px-4 py-2.5 pr-11 text-sm outline-none focus:border-clay transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-ink-soft hover:text-ink transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={16} strokeWidth={1.75} /> : <Eye size={16} strokeWidth={1.75} />}
+                </button>
+              </div>
             </label>
 
             <Button type="submit" variant="primary" loading={loading} className="w-full">

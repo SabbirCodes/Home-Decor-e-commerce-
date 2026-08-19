@@ -30,7 +30,7 @@ export default function ProductBuyBox({ product }: { product: IProduct }) {
   const handleWishlist = async () => {
     if (!session) return router.push("/login");
     try {
-      const added = await toggleWishlist(product._id);
+      const added = await toggleWishlist(product);
       notify.wishlist(added ? "Saved to wishlist" : "Removed from wishlist");
     } catch {
       notify.error("Something went wrong.");
